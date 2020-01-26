@@ -1,19 +1,25 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
+import QtQuick.LocalStorage 2.12
+import "Database.js" as JS
 
 ApplicationWindow {
     id: window
     visible: true
-    width: 640
-    height: 480
+    width: 300
+    height: 540
     title: qsTr("Stack")
+
+    Component.onCompleted: {
+        JS.dbInit()
+    }
 
     header: ToolBar {
         contentHeight: toolButton.implicitHeight
 
         ToolButton {
             id: toolButton
-            text: stackView.depth > 1 ? "\u25C0" : "\u2630"
+            text: stackView.depth > 1 ? qsTr("Back") : qsTr("Menu")
             font.pixelSize: Qt.application.font.pixelSize * 1.6
             onClicked: {
                 if (stackView.depth > 1) {
@@ -24,9 +30,21 @@ ApplicationWindow {
             }
         }
 
+
         Label {
             text: stackView.currentItem.title
             anchors.centerIn: parent
+        }
+
+        ToolButton {
+            id: addExpenseToolButton
+            text: qsTr("+")
+            font.pixelSize: Qt.application.font.pixelSize * 1.6
+            anchors.right: parent.right
+            visible: stackView.depth === 1
+            onClicked: {
+                stackView.push("EditExpense.qml", {"rowid": -1})
+            }
         }
     }
 
@@ -39,18 +57,18 @@ ApplicationWindow {
             anchors.fill: parent
 
             ItemDelegate {
-                text: qsTr("Page 1")
+                text: qsTr("Add Expense")
                 width: parent.width
                 onClicked: {
-                    stackView.push("Page1Form.ui.qml")
+                    stackView.push("EditExpense.qml", {"rowid": -1})
                     drawer.close()
                 }
             }
             ItemDelegate {
-                text: qsTr("Page 2")
+                text: qsTr("Monthly Bill")
                 width: parent.width
                 onClicked: {
-                    stackView.push("Page2Form.ui.qml")
+                    stackView.push("MonthlyBill.qml")
                     drawer.close()
                 }
             }
@@ -59,7 +77,16 @@ ApplicationWindow {
 
     StackView {
         id: stackView
-        initialItem: "HomeForm.ui.qml"
+        initialItem: "Home.qml"
         anchors.fill: parent
+    }
+
+    onClosing: {
+        if (stackView.depth > 1) {
+            close.accepted = false
+            stackView.pop()
+        } else {
+            return
+        }
     }
 }

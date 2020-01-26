@@ -2,13 +2,23 @@ import QtQuick 2.12
 import QtQuick.Controls 2.5
 
 Page {
-    width: 600
-    height: 400
+    width: 300
+    height: 460
+    anchors.fill: parent
+
+    property alias delegate: listView.delegate
+    property alias model: listView.model
 
     title: qsTr("Home")
 
-    Label {
-        text: qsTr("You are on the home page.")
-        anchors.centerIn: parent
+    ListView {
+        id: listView
+        anchors.fill: parent
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
